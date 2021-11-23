@@ -2,19 +2,25 @@ package model;
 
 public class Task {
 
+    private int id;
     private String title;
     private String date;
     private String status;
     private String priority;
     private double progress;
 
-    public Task(String title, String date, String status,String priority, double progress) {
+    public Task(int id, String title, String date, String status,String priority, double progress) {
+        this.id = id;
         this.title = title;
         this.date = date;
         this.status = status;
         this.priority = priority;
         this.progress = progress;
     }
+
+    public int getId() {return this.id;}
+
+    public void setId(int id) {this.id = id;}
 
     public String getTitle() {
         return this.title;

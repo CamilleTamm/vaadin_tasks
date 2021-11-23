@@ -1,21 +1,20 @@
 package org.vaadin.example;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import model.Task;
 
-import java.awt.*;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class TaskDialog extends Dialog {
@@ -45,15 +44,16 @@ public class TaskDialog extends Dialog {
         if(task != null) {
             Date date = new SimpleDateFormat("yyyy-MM-dd").parse(task.getDate());
 
-            datePicker.setValue(LocalDate.of(date.getYear(), date.getMonth(), date.getDay()));
+            datePicker.setValue(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         }
 
-        ListBox<String> listBox = new ListBox<>();
-        listBox.setItems("Not Started", "In Progress", "In Review", "Completed");
-        listBox.setValue("Not Started");
+        Select<String> labelSelect = new Select<>();
+        labelSelect.setItems("Not Started", "In Progress", "In Review", "Completed");
+        labelSelect.setValue("Not Started");
+        labelSelect.setLabel("Status");
 
         if(task != null) {
-            listBox.setValue(task.getStatus());
+            labelSelect.setValue(task.getStatus());
         }
 
         NumberField numberField = new NumberField("Progression");
@@ -71,25 +71,32 @@ public class TaskDialog extends Dialog {
             b_add = new Button("Modifier");
 
             b_add.addClickListener(event ->
-                    this.editTask(mainView, task, textField.getValue(), datePicker.getValue().toString(), listBox.getValue(), numberField.getValue())
+                    this.editTask(mainView, task, textField.getValue(), datePicker.getValue().toString(), labelSelect.getValue(), numberField.getValue())
             );
 
         } else {
             b_add = new Button("Ajouter");
 
-            b_add.addClickListener(event -> addTask(mainView,
-            new Task(textField.getValue(), datePicker.getValue().toString(), listBox.getValue(), "red", numberField.getValue()))
+            b_add.addClickListener(event -> {
+                        try {
+                            addTask(mainView,
+                            new Task(0,textField.getValue(), datePicker.getValue().toString(), labelSelect.getValue(), "red", numberField.getValue()));
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
             );
         }
 
-        verticalLayout.add(textField, listBox, datePicker, numberField, b_add);
+        verticalLayout.add(textField, datePicker, labelSelect, numberField, b_add);
         verticalLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         this.add(verticalLayout);
     }
 
-    private void addTask(MainView mainView, Task task) {
+    private void addTask(MainView mainView, Task task) throws SQLException, ClassNotFoundException {
         mainView.addTask(task);
-        mainView.refreshGrid();
         this.close();
     }
 

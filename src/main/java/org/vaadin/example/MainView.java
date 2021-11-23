@@ -7,10 +7,13 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import db.DatabaseConnection;
+import db.TaskDatabase;
 import model.Task;
 
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -22,18 +25,10 @@ public class MainView extends VerticalLayout {
 
     public MainView() throws SQLException, ClassNotFoundException {
 
-        //Connection con = DatabaseConnection.initializeDatabase();
+        TaskDatabase.init();
 
-        /*Statement st = con.createStatement();
-
-        st.executeQuery("CREATE TABLE TASK IF NOT EXISTS (id PRIMARY KEY AUTO_INCREMENT," +
-                "title varchar(100)," +
-                "date varchar(100)," +
-                "status varchar(100)," +
-                "priority varchar(100)," +
-                "progress int)");*/
-
-        tasks = new ArrayList<Task>();
+        //tasks = new ArrayList<Task>();
+        tasks = TaskDatabase.getTasks();
 
         Button plusButton = new Button(" Ajouter une tache", new Icon(VaadinIcon.PLUS));
         //plusButton.setIconAfterText(true);
@@ -61,7 +56,13 @@ public class MainView extends VerticalLayout {
         }));
 
         grid.addComponentColumn(item -> new Button("Delete", click -> {
-            removeTask(item);
+            try {
+                removeTask(item);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }));
 
         //grid.removeAllColumns();
@@ -76,14 +77,18 @@ public class MainView extends VerticalLayout {
 
         this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
     }
-    public void addTask(Task task) {
-        tasks.add(task);
+
+    public void addTask(Task task) throws SQLException, ClassNotFoundException {
+        TaskDatabase.addTask(task);
+        tasks = TaskDatabase.getTasks();
         grid.setItems(tasks);
         grid.getDataProvider().refreshAll();
     }
 
-    public void removeTask(Task task) {
-        tasks.remove(task);
+    public void removeTask(Task task) throws SQLException, ClassNotFoundException {
+        TaskDatabase.deleteTask(task);
+        tasks = TaskDatabase.getTasks();
+        grid.setItems(tasks);
         grid.getDataProvider().refreshAll();
     }
 
