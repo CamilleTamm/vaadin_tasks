@@ -92,7 +92,10 @@ public class MainView extends VerticalLayout {
         grid.getDataProvider().refreshAll();
     }
 
-    public void refreshGrid() {
+    public void updateTask(Task task) throws  SQLException, ClassNotFoundException {
+        TaskDatabase.updateTask(task);
+        tasks = TaskDatabase.getTasks();
+        grid.setItems(tasks);
         grid.getDataProvider().refreshAll();
     }
 }

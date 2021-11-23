@@ -71,7 +71,15 @@ public class TaskDialog extends Dialog {
             b_add = new Button("Modifier");
 
             b_add.addClickListener(event ->
-                    this.editTask(mainView, task, textField.getValue(), datePicker.getValue().toString(), labelSelect.getValue(), numberField.getValue())
+                    {
+                        try {
+                            this.editTask(mainView, task, textField.getValue(), datePicker.getValue().toString(), labelSelect.getValue(), numberField.getValue());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
             );
 
         } else {
@@ -100,12 +108,13 @@ public class TaskDialog extends Dialog {
         this.close();
     }
 
-    private void editTask(MainView mainView, Task task, String newTitle, String newDate, String newStatus, double newProgress) {
+    private void editTask(MainView mainView, Task task, String newTitle, String newDate, String newStatus, double newProgress)
+    throws SQLException, ClassNotFoundException {
         task.setTitle(newTitle);
         task.setDate(newDate);
         task.setStatus(newStatus);
         task.setProgress(newProgress);
-        mainView.refreshGrid();
+        mainView.updateTask(task);
         this.close();
     }
 }

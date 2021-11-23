@@ -71,5 +71,15 @@ public class TaskDatabase {
 
     public static void updateTask(Task task) throws  SQLException, ClassNotFoundException {
         Connection con = DatabaseConnection.initializeDatabase();
+
+        PreparedStatement add = con.prepareStatement("UPDATE TASK SET title=?, date=?, status=?, priority=?, progress=? WHERE id=?");
+        add.setString(1, task.getTitle());
+        add.setString(2, task.getDate());
+        add.setString(3, task.getStatus());
+        add.setString(4, task.getPriority());
+        add.setDouble(5, task.getProgress());
+        add.setInt(6, task.getId());
+
+        add.executeUpdate();
     }
 }
