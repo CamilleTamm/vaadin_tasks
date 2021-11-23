@@ -11,8 +11,8 @@ public class TaskDatabase {
     public static void init() throws SQLException, ClassNotFoundException {
         Connection con = DatabaseConnection.initializeDatabase();
 
-        PreparedStatement drop = con.prepareStatement("DROP TABLE IF EXISTS TASK");
-        drop.executeUpdate();
+        //PreparedStatement drop = con.prepareStatement("DROP TABLE IF EXISTS TASK");
+        //drop.executeUpdate();
 
         PreparedStatement create = con.prepareStatement("CREATE TABLE IF NOT EXISTS TASK(" +
                 "id int PRIMARY KEY NOT NULL AUTO_INCREMENT," +

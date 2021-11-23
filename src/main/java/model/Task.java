@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Task {
 
     private int id;
@@ -8,6 +11,7 @@ public class Task {
     private String status;
     private String priority;
     private double progress;
+    private List<User> users;
 
     public Task(int id, String title, String date, String status,String priority, double progress) {
         this.id = id;
@@ -16,6 +20,9 @@ public class Task {
         this.status = status;
         this.priority = priority;
         this.progress = progress;
+        this.users = new ArrayList<>();
+        this.users.add(new User(0, "Camille", "Tamim"));
+        this.users.add(new User(0, "Boubou", "Sylla"));
     }
 
     public int getId() {return this.id;}
@@ -56,5 +63,15 @@ public class Task {
 
     public void setProgress(double progress) {
         this.progress = progress;
+    }
+
+    public List<String> getUsers() {
+        List<String> users_string = new ArrayList<>();
+
+        for(User u : this.users) {
+            users_string.add(u.getFirstName() + ' ' + u.getLastName());
+        }
+
+        return users_string;
     }
 }
