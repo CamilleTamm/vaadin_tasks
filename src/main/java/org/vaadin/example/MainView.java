@@ -1,17 +1,17 @@
 package org.vaadin.example;
 
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import db.RelationDatabase;
 import db.TaskDatabase;
 import db.UserDatabase;
@@ -25,14 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Route("")
-public class MainView extends VerticalLayout {
+public class MainView extends VerticalLayout implements RouterLayout {
 
     private Grid<Task> grid;
     private ArrayList<Task> tasks;
     private ArrayList<User> users;
 
     public MainView() throws SQLException, ClassNotFoundException {
-
         TaskDatabase.init();
         UserDatabase.init();
         RelationDatabase.init();
@@ -77,13 +76,15 @@ public class MainView extends VerticalLayout {
             }
         })).setHeader("assign user(s)");
 
-        grid.addComponentColumn(item -> new Button("Update", click -> {
+        grid.addComponentColumn(item -> new Anchor("edit/" + item.getId(), "Edit"));
+
+        /*grid.addComponentColumn(item -> new Button("Edit", click -> {
             try {
                 new TaskDialog(this, item).open();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }));
+        }));*/
 
         grid.addComponentColumn(item -> new Button("Delete", click -> {
             try {

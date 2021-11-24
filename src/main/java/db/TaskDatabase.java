@@ -47,6 +47,29 @@ public class TaskDatabase {
         return tasks;
     }
 
+    public static Task getTaskById(int id) throws SQLException, ClassNotFoundException {
+        Task task = null;
+
+        Connection con = DatabaseConnection.initializeDatabase();
+
+        PreparedStatement stm = con.prepareStatement("SELECT * FROM TASK WHERE id=?");
+        stm.setInt(1, id);
+
+        ResultSet rs = stm.executeQuery();
+
+        while(rs.next()) {
+            final String title = rs.getString("title");
+            final String date = rs.getString("date");
+            final String status = rs.getString("status");
+            final String priority = rs.getString("priority");
+            final double progress = rs.getDouble("progress");
+
+            task = new Task(id, title, date, status, priority, progress);
+        }
+
+        return task;
+    }
+
     public static void addTask(Task task) throws SQLException, ClassNotFoundException {
         Connection con = DatabaseConnection.initializeDatabase();
 
