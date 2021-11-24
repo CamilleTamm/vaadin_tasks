@@ -36,7 +36,6 @@ public class MainView extends VerticalLayout implements RouterLayout {
         UserDatabase.init();
         RelationDatabase.init();
 
-        //tasks = new ArrayList<Task>();
         tasks = TaskDatabase.getTasks();
         users = UserDatabase.getUsers();
 
@@ -64,7 +63,7 @@ public class MainView extends VerticalLayout implements RouterLayout {
         grid.setItems(tasks);
         grid.setColumns("title", "date", "status", "priority", "progress");
 
-        grid.addComponentColumn(item -> getAvatarGroup(item)).setHeader("assigned users");
+        /*grid.addComponentColumn(item -> getAvatarGroup(item)).setHeader("assigned users");
 
         grid.addComponentColumn(item -> new Button(new Icon(VaadinIcon.PLUS), click-> {
             try {
@@ -74,9 +73,23 @@ public class MainView extends VerticalLayout implements RouterLayout {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        })).setHeader("assign user(s)");
+        })).setHeader("assign user(s)");*/
 
-        grid.addComponentColumn(item -> new Anchor("edit/" + item.getId(), "Edit"));
+        grid.addComponentColumn(item -> new HorizontalLayout(
+                getAvatarGroup(item),
+                new Button(new Icon(VaadinIcon.PLUS), click-> {
+                    try {
+                        new RelationDialog(this, item).open();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                })
+        )).setHeader("assigned users");
+
+        grid.addComponentColumn(item -> new Anchor("edit/" + item.getId(), "Editer"));
+        grid.addComponentColumn(item -> new Anchor("remove/" + item.getId(), "Supprimer"));
 
         /*grid.addComponentColumn(item -> new Button("Edit", click -> {
             try {
@@ -86,7 +99,7 @@ public class MainView extends VerticalLayout implements RouterLayout {
             }
         }));*/
 
-        grid.addComponentColumn(item -> new Button("Delete", click -> {
+        /*grid.addComponentColumn(item -> new Button("Delete", click -> {
             try {
                 removeTask(item);
             } catch (SQLException e) {
@@ -94,7 +107,7 @@ public class MainView extends VerticalLayout implements RouterLayout {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }));
+        }));*/
 
         //grid.removeAllColumns();
         //grid.addColumn(Task::getTitle);
