@@ -1,5 +1,8 @@
 package org.vaadin.example;
 
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,6 +15,7 @@ import com.vaadin.flow.router.Route;
 import db.RelationDatabase;
 import db.TaskDatabase;
 import db.UserDatabase;
+import model.Relation;
 import model.Task;
 import model.User;
 
@@ -61,9 +65,17 @@ public class MainView extends VerticalLayout {
         grid.setItems(tasks);
         grid.setColumns("title", "date", "status", "priority", "progress");
 
+        grid.addComponentColumn(item -> getAvatarGroup(item)).setHeader("assigned users");
+
         grid.addComponentColumn(item -> new Button(new Icon(VaadinIcon.PLUS), click-> {
-            new RelationDialog(this, item).open();
-        })).setHeader("Assign user(s)");
+            try {
+                new RelationDialog(this, item).open();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        })).setHeader("assign user(s)");
 
         grid.addComponentColumn(item -> new Button("Update", click -> {
             try {
@@ -122,7 +134,7 @@ public class MainView extends VerticalLayout {
         users = UserDatabase.getUsers();
     }
 
-    public List<String> getUsers() {
+    public List<String> getUsersString() {
         ArrayList<String> users_string = new ArrayList<>();
 
         for(User u : users) {
@@ -130,5 +142,56 @@ public class MainView extends VerticalLayout {
         }
 
         return users_string;
+    }
+
+    public boolean relationExists(Task task, User user) throws SQLException, ClassNotFoundException {
+        ArrayList<Relation> relations = RelationDatabase.getRelations();
+
+        for(Relation r : relations) {
+            if(r.getTaskId() == task.getId() && r.getUserId() == user.getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public List<String> getUsersNamesAssignedToTask(Task task) throws SQLException, ClassNotFoundException {
+        ArrayList<String> names = new ArrayList<>();
+
+        for(Relation r : RelationDatabase.getRelations()) {
+            if(r.getTaskId() == task.getId()) {
+                for(User u : UserDatabase.getUsers()) {
+                    if(u.getId() == r.getUserId()) {
+                        if(!names.contains(u.getCompleteName())) {
+                            names.add(u.getCompleteName());
+                        }
+                    }
+                }
+            }
+        }
+
+        return names;
+    }
+
+    public AvatarGroup getAvatarGroup(Task task) {
+        AvatarGroup avatarGroup = new AvatarGroup();
+
+        try {
+            for (String person : getUsersNamesAssignedToTask(task)) {
+                AvatarGroup.AvatarGroupItem avatar = new AvatarGroup.AvatarGroupItem(person);
+                avatarGroup.add(avatar);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return avatarGroup;
+    }
+
+    public void refreshTheGrid() {
+        grid.getDataProvider().refreshAll();
     }
 }

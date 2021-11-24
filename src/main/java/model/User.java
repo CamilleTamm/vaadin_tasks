@@ -19,4 +19,12 @@ public class User {
     public String getLastName() {
         return this.lastName;
     }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public String getCompleteName() {
+        return this.firstName + " " + this.lastName;
+    }
 }
